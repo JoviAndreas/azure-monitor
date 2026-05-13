@@ -1,0 +1,192 @@
+import { AzureResource, DashboardSummary, MetricPoint } from "./types";
+
+function generateMetricPoints(
+  baseValue: number,
+  variance: number,
+  points = 24
+): MetricPoint[] {
+  const now = new Date();
+  return Array.from({ length: points }, (_, i) => ({
+    timestamp: new Date(now.getTime() - (points - i) * 3600000).toISOString(),
+    value: Math.max(0, Math.min(100, baseValue + (Math.random() - 0.5) * variance * 2)),
+  }));
+}
+
+export const mockResources: AzureResource[] = [
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.Web/serverFarms/prod-plan",
+    name: "prod-app-plan",
+    type: "app-service-plan",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "P2v3",
+    tier: "PremiumV3",
+    status: "critical",
+    recommendation: "upgrade",
+    metrics: { cpuAvg: 87, cpuMax: 98, memoryAvg: 79, memoryMax: 92, requestsPerMin: 4200 },
+    tags: { env: "production", team: "backend" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.Web/sites/api-service",
+    name: "api-service",
+    type: "app-service",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "P2v3",
+    tier: "PremiumV3",
+    status: "critical",
+    recommendation: "upgrade",
+    metrics: { cpuAvg: 88, cpuMax: 99, memoryAvg: 81, memoryMax: 95, requestsPerMin: 3800 },
+    tags: { env: "production", team: "backend" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.Sql/servers/prod-sql/databases/main-db",
+    name: "main-db",
+    type: "sql-database",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "S4",
+    tier: "Standard",
+    status: "warning",
+    recommendation: "upgrade",
+    metrics: { cpuAvg: 71, cpuMax: 89, memoryAvg: 65, memoryMax: 82, dtuAvg: 73, dtuMax: 91 },
+    tags: { env: "production", team: "data" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/prod-pg",
+    name: "prod-pg",
+    type: "postgresql",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "Standard_D4s_v3",
+    tier: "GeneralPurpose",
+    status: "healthy",
+    recommendation: "ok",
+    metrics: { cpuAvg: 32, cpuMax: 55, memoryAvg: 41, memoryMax: 60, connectionsAvg: 120 },
+    tags: { env: "production", team: "data" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.Cache/Redis/prod-redis",
+    name: "prod-redis",
+    type: "redis",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "C2",
+    tier: "Standard",
+    status: "healthy",
+    recommendation: "downgrade",
+    metrics: { cpuAvg: 8, cpuMax: 14, memoryAvg: 12, memoryMax: 18 },
+    tags: { env: "production", team: "backend" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/staging-rg/providers/Microsoft.Web/serverFarms/staging-plan",
+    name: "staging-app-plan",
+    type: "app-service-plan",
+    resourceGroup: "staging-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "S2",
+    tier: "Standard",
+    status: "healthy",
+    recommendation: "downgrade",
+    metrics: { cpuAvg: 5, cpuMax: 11, memoryAvg: 18, memoryMax: 24, requestsPerMin: 80 },
+    tags: { env: "staging", team: "devops" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.DocumentDB/databaseAccounts/prod-cosmos",
+    name: "prod-cosmos",
+    type: "cosmosdb",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "400 RU/s",
+    tier: "Provisioned",
+    status: "warning",
+    recommendation: "review",
+    metrics: { cpuAvg: 62, cpuMax: 78, memoryAvg: 55, memoryMax: 70 },
+    tags: { env: "production", team: "data" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/prod-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks",
+    name: "prod-aks",
+    type: "aks",
+    resourceGroup: "prod-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "Standard_D4s_v3 x3",
+    tier: "Standard",
+    status: "healthy",
+    recommendation: "ok",
+    metrics: { cpuAvg: 44, cpuMax: 67, memoryAvg: 58, memoryMax: 71 },
+    tags: { env: "production", team: "platform" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/dev-rg/providers/Microsoft.Web/sites/dev-api",
+    name: "dev-api",
+    type: "app-service",
+    resourceGroup: "dev-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "B1",
+    tier: "Basic",
+    status: "healthy",
+    recommendation: "ok",
+    metrics: { cpuAvg: 12, cpuMax: 28, memoryAvg: 22, memoryMax: 35, requestsPerMin: 15 },
+    tags: { env: "development", team: "backend" },
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: "/subscriptions/sub1/resourceGroups/dev-rg/providers/Microsoft.DBforMySQL/flexibleServers/dev-mysql",
+    name: "dev-mysql",
+    type: "mysql",
+    resourceGroup: "dev-rg",
+    subscription: "Production",
+    location: "Southeast Asia",
+    sku: "Standard_B2ms",
+    tier: "Burstable",
+    status: "healthy",
+    recommendation: "ok",
+    metrics: { cpuAvg: 9, cpuMax: 22, memoryAvg: 31, memoryMax: 45, connectionsAvg: 8 },
+    tags: { env: "development", team: "backend" },
+    lastUpdated: new Date().toISOString(),
+  },
+];
+
+export function getMockMetrics(resourceId: string, metric: string): MetricPoint[] {
+  const resource = mockResources.find((r) => r.id === resourceId);
+  if (!resource) return [];
+
+  const baseMap: Record<string, number> = {
+    cpu: resource.metrics.cpuAvg,
+    memory: resource.metrics.memoryAvg,
+    dtu: resource.metrics.dtuAvg ?? 0,
+    connections: resource.metrics.connectionsAvg ?? 0,
+    requests: resource.metrics.requestsPerMin ?? 0,
+  };
+
+  return generateMetricPoints(baseMap[metric] ?? 50, 15);
+}
+
+export function getDashboardSummary(): DashboardSummary {
+  return {
+    total: mockResources.length,
+    healthy: mockResources.filter((r) => r.status === "healthy").length,
+    warning: mockResources.filter((r) => r.status === "warning").length,
+    critical: mockResources.filter((r) => r.status === "critical").length,
+    upgradeNeeded: mockResources.filter((r) => r.recommendation === "upgrade").length,
+    downgradeOpportunity: mockResources.filter((r) => r.recommendation === "downgrade").length,
+  };
+}

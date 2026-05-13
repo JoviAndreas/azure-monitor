@@ -1,0 +1,64 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://collector:8080
+    depends_on:
+      - collector
+    restart: unless-stopped
+    networks:
+      - proxy
+      - internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.azure-monitor.rule=Host(`watch.jovi`)
+      - traefik.http.routers.azure-monitor.entrypoints=websecure
+      - traefik.http.routers.azure-monitor.tls=true
+      - traefik.http.services.azure-monitor.loadbalancer.server.port=3000
+
+  collector:
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    environment:
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_SUBSCRIPTION_IDS=${AZURE_SUBSCRIPTION_IDS}
+      - DATABASE_URL=postgresql://monitor:monitor@db:5432/azuremonitor
+      - COLLECT_INTERVAL_SECONDS=300
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=monitor
+      - POSTGRES_PASSWORD=monitor
+      - POSTGRES_DB=azuremonitor
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U monitor"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  proxy:
+    external: true
+  internal:
+    driver: bridge
+
+volumes:
+  pgdata:
